@@ -1,0 +1,84 @@
+---
+title: "Alfa errors Two Sample t-test"
+output: html_document
+date: "2024-02-21"
+owner: "Carlos Felipe Marín Rivera"
+---
+
+## Alfa-errors Two Sample t-test
+
+Simulations for the understanding of the alfa-errors (error of the first kind) in a two sample t-test accounting for different sample sizes.
+
+The code runs a series of simulations, each of one performs a defined number of t-tests for the mean of two samples of size n with the same underlying probability distribution (a normal distribution in this case). The simulation is runned for the specified sampled sizes indicated in the vector `sample_sizes`. The output consists on boxplots plotting the ratio of significant tests over the total performed tests for each simulation
+
+Please input the parameters for the simulation. `sample_sizes` is a vector containing the desired sizes of the samples with which the t-tests are to be performed. The simulation is runned for each sample size at a time. `sign_level` is the arbitrarily defined significance level for the t-test, it is used to defined which tests are significant or not, according to their p-values. `total_simulations` contain the number of simulations, in each simulation, a series of t-tests is performed, each t-test is performed over two samples of the same size randomly withdrawn from a normal distribution with an internally defined mean and standard deviation using `rnorm()`. The t-tests are performed several times per simulation (`tests__per_simulation`), just by sub-setting a different random sample from the same distribution each time, so that a percentage of significant and not significant tests can be calculated. The parameters of the distribution are the same within a simulation, but they change among simulations. At the end, for a given sample size, a boxplot with the alfa-errors is plotted, along with the predefined significance level.
+
+```{r Input parameters of the simulation}
+
+sample_sizes <- c(3, 5, 10, 20, 30, 100, 1000)
+sign_level <- 0.05
+total_simulations <- 100
+tests_per_simulation <- 100
+```
+
+```{r Run the simulation}
+
+for (n in sample_sizes){
+  simulations <- 0 #Number of simulations
+  sign <- numeric(0) #Percentage of significant testes per simulation
+  notsign <- numeric(0) #Percentage of not significant tests per simulation
+  
+  while (simulations <= total_simulations) {
+    tests <- 0 #Number of total performed tests per simulation
+    count_sign <- 0 #Number of significant tests
+    count_notsign <- 0 #Number of not significant tests
+    sign_p <- numeric(0) #Pvalues of the significant tests
+    notsign_p <- numeric(0) #Pvalues of the not significant tests
+    
+    #Set a random mean and sd for the underlying prob. distribution
+    mean <- runif(1, min=4, max=10) 
+    sd <- runif(1, min=1, max=3)
+
+    while (tests <= tests_per_simulation) {
+      #Two random samples with the same underlying prob. distribution
+      m1 <- rnorm(n, mean, sd) 
+      m2 <- rnorm(n, mean, sd)
+      
+      test <- t.test(m1, m2) #Performing test
+      
+      #Uncomment if you want to plot (Increases computation time)
+      #par(mfrow=c(1,2))
+      #plot(m1, ylim = c(5,11), main=paste0("mean 1= ", mean(m1)))
+      #plot(m2, ylim = c(5,11), main=paste0("mean 2= ", mean(m2)))
+      #title(paste0("t test p-value= ", test$p.value),
+      #     line = 0.5, font.main = 1, cex.main = 1)
+      
+      if (test$p.value < sign_level) {
+        count_sign = count_sign + 1
+        sign_p <- c(sign_p, test$p.value)
+      } else {
+        count_notsign = count_notsign + 1
+        notsign_p <- c(notsign_p, test$p.value)
+      }
+      
+      tests = tests + 1 
+    }
+    
+    #Fraction of significant tests (False positives) for current simulation
+    sign <- c(sign, count_sign/tests) 
+    
+    #Fraction of not significant tests for current simulation
+    notsign <- c(notsign, count_notsign/tests) 
+    
+    simulations = simulations+1
+  }
+  
+  boxplot(sign, ylab="Alfa-error", 
+          main= paste0("Alfa error for a t-test with a sample size n=", n), 
+          ylim=c(0,0.15))
+  abline(h=sign_level, col="red", lty="dashed")
+  legend("topright", legend ="Significance level", col="red", lty="dashed")
+}
+```
+
+\`\`\`
