@@ -28,11 +28,3 @@ The idea: simulate, test, and visualize how often we falsely reject the null hyp
 3. **Output**  
    - For each sample size, the ratio of significant tests is computed.  
    - Results are visualized with **boxplots**, showing the empirical Type I error vs. the theoretical `sign_level`.  
-
----
-
-## Example Output  
-
-Boxplots of α-errors across simulations, with the significance threshold marked for reference:  
-
----
