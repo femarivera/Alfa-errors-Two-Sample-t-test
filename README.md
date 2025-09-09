@@ -1,6 +1,5 @@
 
 ![R](https://img.shields.io/badge/R-276DC3?style=for-the-badge&logo=r&logoColor=white)
-![License](https://img.shields.io/badge/License-MIT-green.svg)
 ![Last Commit](https://img.shields.io/github/last-commit/femarivera/Alfa-errors-Two-Sample-t-test
 )
 ![Issues](https://img.shields.io/github/issues/femarivera/Alfa-errors-Two-Sample-t-test
